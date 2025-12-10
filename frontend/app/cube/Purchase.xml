@@ -1,0 +1,50 @@
+<Schema name="Purchase">
+
+  <!-- ========== DIMENSION VENDOR ========== -->
+  <Dimension name="Vendor" type="StandardDimension">
+    <Hierarchy hasAll="true" allMemberName="Semua Vendor" primaryKey="VendorID">
+      <Table name="dim_vendor"/>
+      <Level name="Vendor" column="VendorName" type="String" uniqueMembers="false"/>
+    </Hierarchy>
+  </Dimension>
+
+  <!-- ========== DIMENSION STORE ========== -->
+  <Dimension name="Store" type="StandardDimension">
+    <Hierarchy hasAll="true" allMemberName="Semua Store" primaryKey="StoreID">
+      <Table name="dim_store"/>
+      <Level name="Store" column="StoreName" type="String" uniqueMembers="true"/>
+    </Hierarchy>
+  </Dimension>
+
+  <!-- ========== DIMENSION PRODUK ========== -->
+  <Dimension name="Produk" type="StandardDimension">
+    <Hierarchy hasAll="true" allMemberName="Semua Produk" primaryKey="ProductID">
+      <Table name="dim_produk"/>
+      <Level name="Produk" column="ProductName" type="String" uniqueMembers="false"/>
+    </Hierarchy>
+  </Dimension>
+
+  <!-- ========== DIMENSION WAKTU ========== -->
+  <Dimension name="Waktu" type="TimeDimension">
+    <Hierarchy hasAll="true" allMemberName="Semua Waktu" primaryKey="DateKey">
+      <Table name="dim_waktu"/>
+      <Level name="Tahun" column="Year" type="Numeric" levelType="TimeYears"/>
+      <Level name="Bulan" column="Month" type="String" levelType="TimeMonths"/>
+    </Hierarchy>
+  </Dimension>
+
+  <!-- ========== CUBE PURCHASE ========== -->
+  <Cube name="Purchase">
+    <Table name="fak_purchase"/>
+
+    <DimensionUsage name="Waktu" source="Waktu" foreignKey="DateKey"/>
+    <DimensionUsage name="Vendor" source="Vendor" foreignKey="VendorID"/>
+    <DimensionUsage name="Store" source="Store" foreignKey="StoreID"/>
+    <DimensionUsage name="Produk" source="Produk" foreignKey="ProductID"/>
+
+    <Measure name="Total Pembelian" column="LineTotal" aggregator="sum"/>
+    <Measure name="Total Transaksi" column="PurchaseOrderID" aggregator="count"/>
+
+  </Cube>
+
+</Schema>

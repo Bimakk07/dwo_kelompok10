@@ -1,0 +1,52 @@
+<Schema name="sales">
+  <Dimension type="TimeDimension" visible="true" highCardinality="false" name="Waktu">
+    <Hierarchy name="Waktu" visible="true" hasAll="true" allMemberName="Semua_Waktu" primaryKey="DateKey">
+      <Table name="dim_waktu">
+      </Table>
+      <Level name="Tahun" visible="true" column="Year" type="Integer" uniqueMembers="false" levelType="TimeYears" hideMemberIf="Never">
+      </Level>
+      <Level name="Bulan" visible="true" column="Month" type="String" uniqueMembers="false" levelType="TimeMonths" hideMemberIf="Never">
+      </Level>
+    </Hierarchy>
+  </Dimension>
+  <Dimension type="StandardDimension" visible="true" highCardinality="false" name="Produk">
+    <Hierarchy name="Produk" visible="true" hasAll="true" allMemberName="Semua_Produk" primaryKey="ProductID">
+      <Table name="dim_produk">
+      </Table>
+      <Level name="Produk" visible="true" column="ProductName" type="String" uniqueMembers="false" levelType="Regular" hideMemberIf="Never">
+      </Level>
+    </Hierarchy>
+  </Dimension>
+  <Dimension type="StandardDimension" visible="true" highCardinality="false" name="Wilayah">
+    <Hierarchy name="Wilayah" visible="true" hasAll="true" allMemberName="Semua_Wilayah" primaryKey="TerritoryID">
+      <Table name="dim_salesteritori">
+      </Table>
+      <Level name="Wilayah" visible="true" column="Name" type="String" uniqueMembers="false" levelType="Regular" hideMemberIf="Never">
+      </Level>
+    </Hierarchy>
+  </Dimension>
+  <Dimension type="StandardDimension" visible="true" highCardinality="false" name="Customer">
+    <Hierarchy name="Customer" visible="true" hasAll="true" allMemberName="Semua_Customer" primaryKey="CustomerID">
+      <Table name="dim_customer" alias="Customer">
+      </Table>
+      <Level name="Nama" visible="true" column="namalengkap" type="String" uniqueMembers="false" levelType="Regular" hideMemberIf="Never">
+      </Level>
+    </Hierarchy>
+  </Dimension>
+  <Cube name="Sales" visible="true" cache="true" enabled="true">
+    <Table name="fak_sales">
+    </Table>
+    <DimensionUsage source="Waktu" name="Waktu" visible="true" foreignKey="DateKey" highCardinality="false">
+    </DimensionUsage>
+    <DimensionUsage source="Produk" name="Produk" visible="true" foreignKey="ProductID" highCardinality="false">
+    </DimensionUsage>
+    <DimensionUsage source="Wilayah" name="Wilayah" visible="true" foreignKey="TerritoryID" highCardinality="false">
+    </DimensionUsage>
+    <DimensionUsage source="Customer" name="Customer" visible="true" foreignKey="CustomerID" highCardinality="false">
+    </DimensionUsage>
+    <Measure name="Total Penjualan" column="TotalDue" aggregator="sum" visible="true">
+    </Measure>
+    <Measure name="Total Transaksi" column="SalesOrderDetailID" aggregator="count" visible="true">
+    </Measure>
+  </Cube>
+</Schema>
