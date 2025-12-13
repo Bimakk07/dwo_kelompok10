@@ -60,7 +60,12 @@ export default function BarSalesPurchase({ data, title, color, drillApi }) {
               return value;
             }}
           />
-          <Tooltip formatter={(value) => value.toLocaleString()} />
+          <Tooltip
+            formatter={(value) =>
+              `${Number(value).toLocaleString("id-ID")}`
+            }
+          />
+
           <Legend />
           <Bar dataKey="total" fill={color || "#0ea5e9"} />
         </BarChart>
@@ -88,7 +93,12 @@ export default function BarSalesPurchase({ data, title, color, drillApi }) {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
-              <Tooltip formatter={(val) => val.toLocaleString()} />
+              <Tooltip
+                formatter={(value) =>
+                  `${Number(value).toLocaleString("id-ID")}`
+                }
+                labelFormatter={(label) => `Bulan: ${label}`}
+              />
               <Line
                 type="monotone"
                 dataKey="total"

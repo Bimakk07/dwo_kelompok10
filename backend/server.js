@@ -6,11 +6,14 @@ const salesRoutes = require("./routes/sales");
 const vendorRoutes = require("./routes/vendor");
 const customerRoutes = require("./routes/customer");
 const summaryRoutes = require("./routes/summary"); // tambahkan ini
+const authRoutes = require("./routes/auth");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+//ROUTES
+app.use("/api/auth", authRoutes); 
 app.use("/api/purchase", purchaseRoutes);
 app.use("/api/sales", salesRoutes);
 app.use("/api/vendor", vendorRoutes);

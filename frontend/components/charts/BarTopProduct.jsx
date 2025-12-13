@@ -14,7 +14,7 @@ export default function BarTopProduct({ data }) {
   const topData = data.slice(0, 5);
   const formatted = topData.map(d => ({
     name: d.ProductName,
-    value: Number(d.total)
+    Total: Number(d.total)
   }));
 
   const COLORS = ["#ff0000ff", "#f46600ff", "#EAB308", "#95f800ff", "#00ff6aff"];
@@ -50,7 +50,7 @@ export default function BarTopProduct({ data }) {
             return value;
           }} />
           <Tooltip formatter={(value) => Number(value).toLocaleString()} />
-          <Bar dataKey="value" onClick={handleBarClick}>
+          <Bar dataKey="Total" onClick={handleBarClick}>
             {formatted.map((_, index) => (
               <Cell key={index} fill={COLORS[index % COLORS.length]} cursor="pointer" />
             ))}

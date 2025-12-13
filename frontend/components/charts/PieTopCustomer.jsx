@@ -12,7 +12,7 @@ export default function PieTopCustomer({ data }) {
     const formatted = data.map(c => ({
         name: c.customer,
         id: c.customer_id,
-        value: parseFloat(c.total),
+        Total: parseFloat(c.total),
     }));
 
     const COLORS = ["#EF4444", "#F97316", "#EAB308", "#22C55E", "#3B82F6"];
@@ -25,7 +25,6 @@ export default function PieTopCustomer({ data }) {
 
         setSelectedCustomer({ id: customerId, name: customerName });
 
-        // fetch top 10 produk yang dibeli customer berdasarkan total
         fetch(`http://localhost:5000/api/sales/customer/${customerId}`)
             .then(res => res.json())
             .then(json => {
@@ -35,7 +34,7 @@ export default function PieTopCustomer({ data }) {
                     .map(p => ({
                         product: p.product,
                         qty: p.qty,
-                        total: parseFloat(p.total),
+                        Total: parseFloat(p.total),
                     }));
                 setProductData(top10);
             })
@@ -55,7 +54,7 @@ export default function PieTopCustomer({ data }) {
                 <PieChart>
                     <Pie
                         data={formatted}
-                        dataKey="value"
+                        dataKey="Total"
                         nameKey="name"
                         outerRadius={120}
                         label={false}
@@ -66,8 +65,17 @@ export default function PieTopCustomer({ data }) {
                         ))}
                     </Pie>
 
-                    <Tooltip />
-                    <Legend />
+                    {/* Tooltip format Nama Total : Rp ... */}
+                    <Tooltip
+                        formatter={(value, name) => {
+                            return [` ${Number(value).toLocaleString("id-ID")}`, `${name} Total`];
+                        }}
+                    />
+
+                    {/* Legend  menampilkan nama */}
+                    <Legend
+                        formatter={(value, entry) => entry?.payload?.name || value}
+                    />
                 </PieChart>
             </ResponsiveContainer>
 
@@ -76,7 +84,7 @@ export default function PieTopCustomer({ data }) {
                 <div className="mt-10">
                     <div className="flex justify-between items-center mb-2">
                         <h3 className="font-semibold text-lg">
-                            Top 10 Products purchased by: {selectedCustomer.name}
+                            Top 10 Produk yang dibeli : {selectedCustomer.name}
                         </h3>
                         <button
                             onClick={closeDrilldown}
@@ -93,9 +101,9 @@ export default function PieTopCustomer({ data }) {
                         >
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="product" angle={-45} textAnchor="end" interval={0} />
-                            <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="total" fill="#3B82F6" />
+                            <YAxis tickFormatter={(value) => value.toLocaleString()} />
+                            <Tooltip formatter={(value) => `Rp ${value.toLocaleString("id-ID")}`} />
+                            <Bar dataKey="Total" fill="#3B82F6" />
                         </BarChart>
                     </ResponsiveContainer>
 
@@ -112,7 +120,7 @@ export default function PieTopCustomer({ data }) {
                                 <tr key={index} className="border">
                                     <td className="p-2 border">{item.product}</td>
                                     <td className="p-2 border">{item.qty}</td>
-                                    <td className="p-2 border">{item.total.toLocaleString()}</td>
+                                    <td className="p-2 border">{item.Total.toLocaleString("id-ID")}</td>
                                 </tr>
                             ))}
                         </tbody>

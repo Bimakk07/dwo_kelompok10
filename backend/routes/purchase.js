@@ -18,7 +18,7 @@ router.get("/pertahun", (req, res) => {
         FROM fak_purchase p
         JOIN dim_waktu w ON p.DateKey = w.DateKey
         GROUP BY w.Year
-        ORDER BY w.Year ASC
+        ORDER BY w.Year ASC 
     `;
     db.query(sql, (err, data) => {
         if (err) return res.status(500).json(err);

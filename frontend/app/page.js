@@ -1,6 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
 import CardStats from "@/components/CardStats";
 import BarSalesPurchase from "@/components/charts/BarSalesPurchase";
 import PieTopVendor from "@/components/charts/PieTopVendor";
@@ -8,6 +11,8 @@ import PieTopCustomer from "@/components/charts/PieTopCustomer";
 import BarTopProduct from "@/components/charts/BarTopProduct";
 
 export default function Home() {
+  const router = useRouter();
+
   const [stats, setStats] = useState({
     sales: 0,
     product: 0,
@@ -23,13 +28,14 @@ export default function Home() {
     topProduct: [],
   });
 
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [customerProducts, setCustomerProducts] = useState([]);
-
-  const [selectedVendor, setSelectedVendor] = useState(null);
-  const [vendorProducts, setVendorProducts] = useState([]);
-
+  // --- CEK LOGIN & FETCH DATA ---
   useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    if (!isLoggedIn || isLoggedIn !== "true") {
+      router.push("/auth");
+      return;
+    }
+
     async function fetchData() {
       try {
         const sTotal = await fetch("http://localhost:5000/api/sales/total").then(r => r.json());
@@ -64,57 +70,21 @@ export default function Home() {
     }
 
     fetchData();
-  }, []);
-
-  // Drilldown Customer
-  const fetchCustomerProducts = async (customerId, customerName) => {
-    try {
-      const res = await fetch(`http://localhost:5000/api/sales/customer/${customerId}`);
-      const data = await res.json();
-      setCustomerProducts(data);
-      setSelectedCustomer(customerName);
-    } catch (err) {
-      console.error("Drilldown Customer Error:", err);
-    }
-  };
-
-  // Drilldown Vendor
-  const fetchVendorProducts = async (vendorId, vendorName) => {
-    try {
-      const res = await fetch(`http://localhost:5000/api/purchase/vendor/${vendorId}/top-product`);
-      const data = await res.json();
-      setVendorProducts(data);
-      setSelectedVendor(vendorName);
-    } catch (err) {
-      console.error("Drilldown Vendor Error:", err);
-    }
-  };
-
-  const closeDrilldown = () => {
-    setSelectedCustomer(null);
-    setCustomerProducts([]);
-  };
-
-  const closeVendorDrilldown = () => {
-    setSelectedVendor(null);
-    setVendorProducts([]);
-  };
+  }, [router]);
 
   const renderTable = (data) => (
-    <table className="min-w-full divide-y divide-gray-200 border text-black">
+    <table className="min-w-full border text-black">
       <thead className="bg-gray-50">
         <tr>
-          <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Produk</th>
-          <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Qty</th>
-          
+          <th className="p-2 border">Produk</th>
+          <th className="p-2 border">Qty</th>
         </tr>
       </thead>
-      <tbody className="bg-white divide-y divide-gray-200">
-        {data.map((item, idx) => (
-          <tr key={idx}>
-            <td className="px-4 py-2">{item.product}</td>
-            <td className="px-4 py-2">{item.qty}</td>
-            
+      <tbody>
+        {data.map((item, i) => (
+          <tr key={i}>
+            <td className="p-2 border">{item.product}</td>
+            <td className="p-2 border">{item.qty}</td>
           </tr>
         ))}
       </tbody>
@@ -122,96 +92,85 @@ export default function Home() {
   );
 
   return (
-    <div className="p-10 space-y-10">
-      <h1 className="text-3xl font-bold text-black">Dashboard AdventureWorks</h1>
+    <div className="flex h-screen">
+      {/* ===== SIDEBAR ===== */}
+      <aside className="w-64 bg-gray-800 text-white flex flex-col p-4 gap-4">
+        <h1 className="text-2xl font-bold mb-4">📊 Warehouse Panel</h1>
 
-      {/* CARD STATS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <CardStats
-  title="Total Sales"
-  value={Math.round(stats.sales).toLocaleString("id-ID")}
-/>
+        <Link href="/" className="p-3 rounded hover:bg-gray-700 border border-gray-600">
+          🏠 Dashboard
+        </Link>
 
-        <CardStats title="Total Produk" value={stats.product?.toLocaleString()} />
-        <CardStats title="Total Vendor" value={stats.vendor} />
-        <CardStats title="Total Customer" value={stats.customer} />
-      </div>
+        <Link href="/cube" className="p-3 rounded hover:bg-gray-700 border border-gray-600">
+          🧊 Cube OLAP
+        </Link>
 
-      {/* BAR CHART */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <BarSalesPurchase
-          data={chart.purchaseYearly}
-          title="Purchase per Tahun"
-          color="#10b981"
-          drillApi="http://localhost:5000/api/purchase/monthly/"
-        />
-        <BarSalesPurchase
-          data={chart.salesYearly}
-          title="Sales per Tahun"
-          color="#0ea5e9"
-          drillApi="http://localhost:5000/api/sales/monthly/"
-        />
-      </div>
+        {/* Logout Button */}
+        <button
+          onClick={() => {
+            localStorage.removeItem("isLoggedIn");
+            router.push("/auth");
+          }}
+          className="mt-auto flex items-center gap-2 px-4 py-2 border border-red-500 text-red-500 rounded hover:bg-red-50 transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 21V3h12l6 6v12H3zM15 3v6h6M15 12l6 6"
+            />
+          </svg>
+          Logout
+        </button>
 
-      {/* PIE + DRILLDOWN */}
-      <div className="grid md:grid-cols-3 gap-6 items-start">
+        <div className="mt-4 text-center font-bold">
+          Kelompok 10 DWO
+        </div>
+      </aside>
 
-        {/* PIE TOP VENDOR + DRILLDOWN */}
-        <div className="space-y-4">
-          <PieTopVendor
-            data={chart.topVendor}
-            onSliceClick={(vendor) => fetchVendorProducts(vendor.id, vendor.name)}
-          />
+      {/* ===== CONTENT ===== */}
+      <main className="flex-1 bg-gray-100 p-6 overflow-auto">
+        <h1 className="text-3xl font-bold mb-6 text-black">
+          Dashboard AdventureWorks
+        </h1>
 
-          {selectedVendor && (
-            <div className="bg-white shadow-lg rounded-lg p-5 border border-gray-200 text-black">
-              <div className="flex justify-between mb-3">
-                <h2 className="text-lg font-bold">
-                  Ringkasan produk Vendor: {selectedVendor}
-                </h2>
-                <button
-                  onClick={closeVendorDrilldown}
-                  className="text-red-500 text-sm font-semibold hover:underline"
-                >
-                  Tutup
-                </button>
-              </div>
-
-              {renderTable(vendorProducts)}
-            </div>
-          )}
+        {/* CARD STATS */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+          <CardStats title="Total Sales" value={Math.round(stats.sales).toLocaleString("id-ID")} />
+          <CardStats title="Total Produk" value={stats.product?.toLocaleString()} />
+          <CardStats title="Total Vendor" value={stats.vendor} />
+          <CardStats title="Total Customer" value={stats.customer} />
         </div>
 
-        {/* PIE TOP CUSTOMER + DRILLDOWN */}
-        <div className="space-y-4">
-          <PieTopCustomer
-            data={chart.topCustomer}
-            onSliceClick={(customer) => fetchCustomerProducts(customer.id, customer.name)}
+        {/* CHART */}
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          <BarSalesPurchase
+            data={chart.purchaseYearly}
+            title="Purchase per Tahun"
+            color="#10b981"
+            drillApi="http://localhost:5000/api/purchase/monthly/"
           />
-
-          {selectedCustomer && (
-            <div className="bg-white shadow-lg rounded-lg p-5 border border-gray-200 text-black">
-              <div className="flex justify-between mb-3">
-                <h2 className="text-lg font-bold">
-                  Produk yang dibeli oleh: {selectedCustomer}
-                </h2>
-                <button
-                  onClick={closeDrilldown}
-                  className="text-red-500 text-sm font-semibold hover:underline"
-                >
-                  Tutup
-                </button>
-              </div>
-
-              {renderTable(customerProducts)}
-            </div>
-          )}
+          <BarSalesPurchase
+            data={chart.salesYearly}
+            title="Sales per Tahun"
+            color="#0ea5e9"
+            drillApi="http://localhost:5000/api/sales/monthly/"
+          />
         </div>
 
-        {/* TOP PRODUCT BAR */}
-        <BarTopProduct data={chart.topProduct} />
-
-      </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          <PieTopVendor data={chart.topVendor} />
+          <PieTopCustomer data={chart.topCustomer} />
+          <BarTopProduct data={chart.topProduct} />
+        </div>
+      </main>
     </div>
   );
 }
