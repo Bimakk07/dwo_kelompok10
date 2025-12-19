@@ -9,6 +9,7 @@ import BarSalesPurchase from "@/components/charts/BarSalesPurchase";
 import PieTopVendor from "@/components/charts/PieTopVendor";
 import PieTopCustomer from "@/components/charts/PieTopCustomer";
 import BarTopProduct from "@/components/charts/BarTopProduct";
+import TopTerritory from "@/components/charts/TopTerritory";
 
 export default function Home() {
   const router = useRouter();
@@ -28,10 +29,10 @@ export default function Home() {
     topProduct: [],
   });
 
-  // --- CEK LOGIN & FETCH DATA ---
+  // ===== AUTH CHECK & FETCH DATA =====
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
-    if (!isLoggedIn || isLoggedIn !== "true") {
+    if (isLoggedIn !== "true") {
       router.push("/auth");
       return;
     }
@@ -72,25 +73,6 @@ export default function Home() {
     fetchData();
   }, [router]);
 
-  const renderTable = (data) => (
-    <table className="min-w-full border text-black">
-      <thead className="bg-gray-50">
-        <tr>
-          <th className="p-2 border">Produk</th>
-          <th className="p-2 border">Qty</th>
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((item, i) => (
-          <tr key={i}>
-            <td className="p-2 border">{item.product}</td>
-            <td className="p-2 border">{item.qty}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-
   return (
     <div className="flex h-screen">
       {/* ===== SIDEBAR ===== */}
@@ -105,51 +87,42 @@ export default function Home() {
           🧊 Cube OLAP
         </Link>
 
-        {/* Logout Button */}
         <button
           onClick={() => {
             localStorage.removeItem("isLoggedIn");
             router.push("/auth");
           }}
-          className="mt-auto flex items-center gap-2 px-4 py-2 border border-red-500 text-red-500 rounded hover:bg-red-50 transition"
+          className="mt-auto px-4 py-2 border border-red-500 text-red-500 rounded hover:bg-red-50 transition"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M3 21V3h12l6 6v12H3zM15 3v6h6M15 12l6 6"
-            />
-          </svg>
           Logout
         </button>
 
-        <div className="mt-4 text-center font-bold">
+        <div className="text-center font-bold mt-4">
           Kelompok 10 DWO
         </div>
       </aside>
 
-      {/* ===== CONTENT ===== */}
+      {/* ===== MAIN CONTENT ===== */}
       <main className="flex-1 bg-gray-100 p-6 overflow-auto">
         <h1 className="text-3xl font-bold mb-6 text-black">
           Dashboard AdventureWorks
         </h1>
 
-        {/* CARD STATS */}
+        {/* ===== CARD STATS ===== */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <CardStats title="Total Sales" value={Math.round(stats.sales).toLocaleString("id-ID")} />
-          <CardStats title="Total Produk" value={stats.product?.toLocaleString()} />
+          <CardStats
+            title="Total Sales"
+            value={Math.round(stats.sales).toLocaleString("id-ID")}
+          />
+          <CardStats
+            title="Total Produk"
+            value={stats.product?.toLocaleString("id-ID")}
+          />
           <CardStats title="Total Vendor" value={stats.vendor} />
           <CardStats title="Total Customer" value={stats.customer} />
         </div>
 
-        {/* CHART */}
+        {/* ===== BAR CHART ===== */}
         <div className="grid md:grid-cols-2 gap-6 mb-6">
           <BarSalesPurchase
             data={chart.purchaseYearly}
@@ -165,10 +138,16 @@ export default function Home() {
           />
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        {/* ===== PIE & TOP PRODUCT ===== */}
+        <div className="grid md:grid-cols-3 gap-6 mb-6">
           <PieTopVendor data={chart.topVendor} />
           <PieTopCustomer data={chart.topCustomer} />
           <BarTopProduct data={chart.topProduct} />
+        </div>
+
+        {/* ===== ANALISIS WILAYAH (PALING BAWAH) ===== */}
+        <div className="mt-6">
+          <TopTerritory />
         </div>
       </main>
     </div>

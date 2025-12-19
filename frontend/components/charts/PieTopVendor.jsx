@@ -48,7 +48,7 @@ export default function PieTopVendor({ data }) {
 
   return (
     <div className="p-6 rounded-lg shadow border bg-white text-black">
-      <h2 className="font-bold mb-4 text-lg text-center">Top Vendor Purchase</h2>
+      <h2 className="font-bold mb-4 text-lg text-center">Top 5 Vendor Purchase</h2>
 
       {/* MAIN PIE CHART */}
       <ResponsiveContainer width="100%" height={350}>

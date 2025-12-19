@@ -48,7 +48,7 @@ export default function PieTopCustomer({ data }) {
 
     return (
         <div className="p-6 rounded-lg shadow border bg-white text-black">
-            <h2 className="font-bold mb-4 text-lg text-center">Top Customer Sales</h2>
+            <h2 className="font-bold mb-4 text-lg text-center">Top 5 Customer Sales</h2>
 
             <ResponsiveContainer width="100%" height={350}>
                 <PieChart>

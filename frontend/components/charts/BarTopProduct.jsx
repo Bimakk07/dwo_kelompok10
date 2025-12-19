@@ -38,7 +38,7 @@ export default function BarTopProduct({ data }) {
 
   return (
     <div className="p-6 rounded-lg shadow border bg-white text-black">
-      <h2 className="font-bold text-center mb-4 text-lg">Top Product Sales</h2>
+      <h2 className="font-bold text-center mb-4 text-lg">Top 5 Product Sales</h2>
 
       {/* Top Product BarChart */}
       <ResponsiveContainer width="100%" height={350}>
